@@ -101,6 +101,33 @@ Ora torniamo un attimo indietro, quando ero bambino davanti il multitasking era 
 
 E se pensate che sia complicato allacciate le cinture perché il vostro smartphone oggi ha probabilmente 8 core e ognuno esegue istruzioni multiple per ciclo di clock grazie a una instruction-level parallelism e con lei avete probabilmente decine di processi in esecuzione e centinaia di thread. Il sistema operativo esegue un load balancing fra i core, cercando di distribuire il carico di lavoro in modo che nessun core sia sovraccarico mentre altri sono inattivi. Avete un thermal throttling, cioè se un core diventa troppo caldo, il sistema operativo riduce automaticamente la sua frequenza per evitare il surriscaldamento e avete un dynamic voltage and frequency scaling (DVFS), cioè il sistema operativo riduce la frequenza della CPU quando la domanda di computazione è bassa, per risparmiare batteria. E tutto questo gira su un heterogeneous computing, cioè il vostro smartphone ha alcuni core "grandi" per compiti pesanti e altri core "piccoli" per compiti leggeri, e il sistema operativo decide intelligentemente quale core usare per quale task. E' un'ottimizzazione che avrebbe fatto impazzire i progettisti di sistemi degli anni Ottanta. E il sistema operativo cerca anche di schedulare thread che accedono alla memoria in modo da ridurre la contesa sul bus di memoria (memory bandwidth management). E tutto questo accade senza che voi dobbiate fare nulla e accade milioni di volte al secondo, ogni secondo.
 
+### Altri Mostri
+
+MA il multitaskare ha altri problemi e forse il più famoso è il Deadlock, un concetto che è stato formalizzato da Edward Dijkstra negli anni Sessanta, e la teoria è matematicamente elegante, quattro condizioni devono essere soddisfatte simultaneamente perché si verifichi un deadlock:
+
+1. **Mutual Exclusion**: una risorsa può essere tenuta da un solo processo alla volta.
+2. **Hold and Wait**: un processo che tiene una risorsa può aspettare altre risorse.
+3. **No Preemption**: nessun processo può essere forzato a rilasciare una risorsa.
+4. **Circular Wait**: esiste una catena circolare di processi, ognuno aspettando una risorsa tenuta dal prossimo.
+
+Se riuscite a eliminare anche una sola di queste condizioni, il deadlock non può verificarsi, quindi in teoria è semplice ma pratica è un incubo perché nel momento in cui pendaste di non permettere la mutual exclusion tutti possono accedere alla risorsa nello stesso tempo e vi trovate di fronte al problema della race condition per cui due thread accedono alla stessa memoria nello stesso istante, ognuno leggendo un valore e poi scrivono il loro risultato, che sovrascrive quello dell'altro trasformando un tipo di bug in un altro tipo di bug, e poi c'è la starvation e un sacco di altri problemi.
+
+### Il Teorema CAP
+
+Nel 2000, Eric Brewer ha formulato quello che è diventato conosciuto come il **Teorema CAP** ceh dice che in un sistema distribuito, potete garantire al massimo due delle seguenti tre proprietà:
+
+- **Consistency (Coerenza)**: tutti i nodi vedono gli stessi dati nello stesso momento.
+- **Availability (Disponibilità)**: il sistema risponde sempre alle richieste.
+- **Partition Tolerance (Tolleranza alle Partizioni)**: il sistema continua a funzionare anche se la rete è partita in due.
+
+Se la rete tra il vostro data center A e il vostro data center B si rompe (partition), dovete scegliere se mantenete la coerenza (alcuni server rifiutano richieste) o mantenete la disponibilità (i server continuano a servire richieste, ma i dati divergono). Non c'è una risposta "giusta" ma dipende da quello che il vostro sistema deve fare. Amazon sceglie Availability, se la rete tra i data center si rompe, i server continuano a servire i clienti e accettano che i dati potrebbero essere incoerenti per un po'. Quando la rete si ripara, riconciliano i dati. Un sistema bancario sceglie la Consistency e se la rete si rompe, rifiuta transazioni piuttosto che rischiare che due versioni del vostro conto bancario divergono. Quindi il multitasking è difficile su una singola macchina e diventa impossibilmente complesso quando diventa distribuito E il vostro smartphone moderno? Anche lui è un sistema distribuito, ha il suo processore locale, ma comunica costantemente con server nel cloud, ha una cache locale, ma i dati su quei server potrebbero cambiare. E la vostra email potrebbe essere sincronizzato con il server Google mentre il vostro cliente locale sta leggendo un'email vecchia.
+
+### Determinismo v Non Determinismo
+
+E sorpresa delle sorprese il vostro multitasking moderno è fondamentalmente non deterministico e se eseguite lo stesso programma multithreaded due volte, con gli stessi input, su una macchina multicore non è garantito che otterrete gli stessi risultati nello stesso ordine. Questo a causa dell'interleaving dei thread che è dipendente da mille fattori, quanto tempo impiega la CPU a eseguire quella istruzione particolare (che dipende da cache hits/misses), la temperatura del processore, altri processi in esecuzione nel sistema, la fase lunare (okay, non proprio, ma quasi).
+
+Ma non è solo un male, infatti significa che il sistema operativo e l'hardware possono fare ottimizzazioni aggressive senza doversi preoccupare di una sequenza di esecuzione globale ma è anche straordinariamente pericoloso per la correttezza perché un bug potrebbe manifestarsi una volta ogni milione di esecuzioni, e voi non riuscirete mai a riprodurlo nel vostro debugger. E c'è un campo di ricerca chiamato **runtime verification** che cerca di affrontare questo problema e invece di cercare di provare che un programma multithreaded è corretto (il che potrebbe essere impossibile), monitora l'esecuzione e controlla se certe invarianti vengono violate. Ma questo richiede una comprensione matematica formale di quali siano gli invarianti, e nel multitasking in generale, definire questi invarianti è una forma d'arte pericolosa.
+
 
 ---
 
