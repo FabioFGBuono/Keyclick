@@ -129,6 +129,17 @@ E sorpresa delle sorprese il vostro multitasking moderno è fondamentalmente non
 Ma non è solo un male, infatti significa che il sistema operativo e l'hardware possono fare ottimizzazioni aggressive senza doversi preoccupare di una sequenza di esecuzione globale ma è anche straordinariamente pericoloso per la correttezza perché un bug potrebbe manifestarsi una volta ogni milione di esecuzioni, e voi non riuscirete mai a riprodurlo nel vostro debugger. E c'è un campo di ricerca chiamato **runtime verification** che cerca di affrontare questo problema e invece di cercare di provare che un programma multithreaded è corretto (il che potrebbe essere impossibile), monitora l'esecuzione e controlla se certe invarianti vengono violate. Ma questo richiede una comprensione matematica formale di quali siano gli invarianti, e nel multitasking in generale, definire questi invarianti è una forma d'arte pericolosa.
 
 
+### Il Ritorno del Multitasking Esplicito
+
+Qualcosa di affascinante però è successo negli ultimi dieci anni, quando nessuno se lo aspettava il multitasking è tornato a essere esplicito, infatti negli anni Novanta e Duemilacinque, il paradigma era quesllo di creare thread e lascaire che il sistema operativo le schedulasse, e sperare per il meglio. Voi scrivevate il vostro codice, e il thread scheduler faceva il suo lavoro in background, era tutto implicito. Ma questo approccio ha scalabilità limitate e se avete milioni di connessioni concorrenti (come deve fare un server web moderno), creare un thread per ogni connessione vi farà esaurire la memoria e il tempo di context switch. Così è arrivato **async/await**, un paradigma di programmazione che ritorna a un'idea più vecchia, il **cooperative multitasking** e con lui il runtime può eseguire altri task mentre aspetta un I/O ad esempio.
+
+È più simile ai TSR di una volta, voi controllate esplicitamente quando il controllo viene ceduto, ma è fatto in modo sicuro, dentro il runtime e protetto da tutte le garantie di sicurezza di un linguaggio moderno. JavaScript ha `async/await`. Python ha `async/await`. Rust ha `async/await`. Persino Go, che insiste di essere un linguaggio di multitasking tradizionale con goroutine leggere, in realtà implementa una forma di **M:N threading** dove M thread sono schedulati da N processori da uno scheduler nel runtime.
+
+**Così abbiamo chiso il cerchio, il multitasking esplicito e controllato è tornato di moda... per ora...**
+
+Il multitasking implicito è meraviglioso quando il carico è moderato e le risorse sono abbondanti ma quando dovete scalare a milioni di operazioni concorrenti, il controllo esplicito diventa essenziale.
+
+
 ## Passare la Torcia
 
 Se state leggendo questo e siete giovani, se siete dei principianti che stanno solo iniziando a capire come funzionano i computer, **fatevi un favore, scoprite la storia.** Non solo i risultati finali, ma la storia di come siamo arrivati lì. Leggete di Dijkstra e dei semafori, di Lampson e della cache consistency. Leggete dei fallimenti dei programmatori che cercavano di implementare il multitasking senza capire i dettagli. Leggete i paper classici. Perchè in quella storia troverete gli stessi pattern di pensiero che vi servono per risolvere i problemi odierni. Non gli stessi dettagli tecnici, quelli cambieranno, ma i modi di ragionare e il perché certe idee hanno fallito o sono state superate, quello vi insegnerà moltissmo.
