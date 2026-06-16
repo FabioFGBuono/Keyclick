@@ -129,6 +129,14 @@ E sorpresa delle sorprese il vostro multitasking moderno è fondamentalmente non
 Ma non è solo un male, infatti significa che il sistema operativo e l'hardware possono fare ottimizzazioni aggressive senza doversi preoccupare di una sequenza di esecuzione globale ma è anche straordinariamente pericoloso per la correttezza perché un bug potrebbe manifestarsi una volta ogni milione di esecuzioni, e voi non riuscirete mai a riprodurlo nel vostro debugger. E c'è un campo di ricerca chiamato **runtime verification** che cerca di affrontare questo problema e invece di cercare di provare che un programma multithreaded è corretto (il che potrebbe essere impossibile), monitora l'esecuzione e controlla se certe invarianti vengono violate. Ma questo richiede una comprensione matematica formale di quali siano gli invarianti, e nel multitasking in generale, definire questi invarianti è una forma d'arte pericolosa.
 
 
+## Passare la Torcia
+
+Se state leggendo questo e siete giovani, se siete dei principianti che stanno solo iniziando a capire come funzionano i computer, **fatevi un favore, scoprite la storia.** Non solo i risultati finali, ma la storia di come siamo arrivati lì. Leggete di Dijkstra e dei semafori, di Lampson e della cache consistency. Leggete dei fallimenti dei programmatori che cercavano di implementare il multitasking senza capire i dettagli. Leggete i paper classici. Perchè in quella storia troverete gli stessi pattern di pensiero che vi servono per risolvere i problemi odierni. Non gli stessi dettagli tecnici, quelli cambieranno, ma i modi di ragionare e il perché certe idee hanno fallito o sono state superate, quello vi insegnerà moltissmo.
+
+E forse, se siete fortunati, avrete il vostro momento di meraviglia, potrebbe non essere davanti a uno schermo ma ci sarà, io ne ho avuti tanti e ne ho ancora tanti, il trucco è restare consapevoli e aperti a ogni possibilità.
+
+
+
 ---
 
 https://it.wikipedia.org/wiki/Gruppo_Editoriale_Infomedia
